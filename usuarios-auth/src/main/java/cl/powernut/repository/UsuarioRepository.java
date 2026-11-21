@@ -6,13 +6,7 @@ import cl.powernut.model.Usuario;
 
 
 
-public interface UsuarioRepository extends
-JpaRepository <Usuario, Long>{
-
-    Optional <Usuario> findByCorreo(String correo);
-
-    boolean existsexistsByCorreo(String correo);
-
-
-    
+public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+    boolean existsByCorreo(String correo);
+    Optional<Usuario> findByCorreo(String correo); // si también lo usas
 }

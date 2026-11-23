@@ -2,6 +2,7 @@ package cl.powernut.controller;
 
 import cl.powernut.dto.LoginRequest;
 import cl.powernut.dto.LoginResponse;
+import cl.powernut.dto.RefreshRequest;
 import cl.powernut.dto.RegistroRequest;
 import cl.powernut.dto.UsuarioResponse;
 import cl.powernut.service.UsuarioService;
@@ -40,5 +41,21 @@ public class AuthController {
         
         return service.login(req);
     }
+
+    @PostMapping("/refresh")
+    public LoginResponse refresh(@Valid @RequestBody RefreshRequest req) {
+        //TODO: process POST request
+        
+        return service.renovar(req.refreshToken());
+    }
+    
+@PostMapping("/logout")
+@ResponseStatus (HttpStatus.NO_CONTENT)
+public void logout(@Valid @RequestBody RefreshRequest req) {
+    //TODO: process POST request
+    
+    service.logout(req.refreshToken()); 
+}
+
     
 }

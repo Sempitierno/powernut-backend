@@ -12,39 +12,47 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import cl.powernut.security.JwtAuthFilter;
 
-@EnableMethodSecurity 
-@Configuration 
+@EnableMethodSecurity
+@Configuration
 public class SecurityConfig {
 
-    @Bean 
-    public PasswordEncoder passwordEncoder(){
+    @Bean
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean 
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthFilter jwtFilter) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .headers(h -> h.frameOptions(f -> f.sameOrigin())) //para la consola h2
+            .headers(h -> h.frameOptions(f -> f.sameOrigin())) // para la consola H2
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**", "/h2-console/**").permitAll()
+                .requestMatchers(
+                    "/auth/**",          // registro, login, refresh, logout
+                    "/h2-console/**",    // consola de la BD (solo desarrollo)
+                    "/error",            // páginas de error de Spring
+                    "/swagger-ui/**",    // interfaz de Swagger
+                    "/swagger-ui.html",
+                    "/v3/api-docs/**"    // documentación OpenAPI en JSON
+                ).permitAll()
                 .anyRequest().authenticated()
             )
             .exceptionHandling(e -> e
                 .authenticationEntryPoint((req, res, ex) -> {
                     res.setStatus(401);
                     res.setContentType("application/json");
+                    res.setCharacterEncoding("UTF-8");
                     res.getWriter().write("{\"error\":\"Token inválido o ausente\"}");
                 })
                 .accessDeniedHandler((req, res, ex) -> {
                     res.setStatus(403);
                     res.setContentType("application/json");
+                    res.setCharacterEncoding("UTF-8");
                     res.getWriter().write("{\"error\":\"No tienes permisos para esta acción\"}");
                 })
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-        return  http.build();    
+        return http.build();
     }
-
 }

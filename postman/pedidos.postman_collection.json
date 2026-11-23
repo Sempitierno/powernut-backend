@@ -1,0 +1,124 @@
+{
+  "info": {
+    "name": "PowerNut - Pedidos (Carrito, Ordenes y Pagos)",
+    "description": "Coleccion del microservicio pedidos (Integrante 3). Incluye flujo completo, validacion de stock (400), sin sesion (401) y aislamiento de usuarios (403).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8083" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Carrito sin autenticacion (401)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/v1/cart"
+      }
+    },
+    {
+      "name": "2. Agregar producto al carrito (201)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-User-Id", "value": "1" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"productoId\": 1,\n  \"cantidad\": 2\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/cart/items"
+      }
+    },
+    {
+      "name": "3. Agregar excediendo stock (400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-User-Id", "value": "1" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"productoId\": 1,\n  \"cantidad\": 999\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/cart/items"
+      }
+    },
+    {
+      "name": "4. Ver carrito del usuario (200)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-User-Id", "value": "1" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{baseUrl}}/api/v1/cart"
+      }
+    },
+    {
+      "name": "5. Crear orden desde carrito (201)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "X-User-Id", "value": "1" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{baseUrl}}/api/v1/orders"
+      }
+    },
+    {
+      "name": "6. Listar mis ordenes (200)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-User-Id", "value": "1" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{baseUrl}}/api/v1/orders"
+      }
+    },
+    {
+      "name": "7. Ver orden de otro usuario (403)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-User-Id", "value": "2" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{baseUrl}}/api/v1/orders/1"
+      }
+    },
+    {
+      "name": "8. Procesar pago APROBADO (201)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-User-Id", "value": "1" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"ordenId\": 1,\n  \"resultado\": \"APROBADO\"\n}"
+        },
+        "url": "{{baseUrl}}/api/v1/payments"
+      }
+    },
+    {
+      "name": "9. Consultar pago de la orden (200)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-User-Id", "value": "1" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{baseUrl}}/api/v1/payments/order/1"
+      }
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: powernut-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: powernut
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  usuarios-auth:
+    build: ./usuarios-auth
+    container_name: powernut-auth
+    ports:
+      - "8081:8081"
+    environment:
+      DB_HOST: mysql
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  catalogo-productos:
+    build: ./catalogo-productos
+    container_name: powernut-catalogo
+    ports:
+      - "8082:8082"
+    environment:
+      DB_HOST: mysql
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  pedidos:
+    build: ./pedidos
+    container_name: powernut-pedidos
+    ports:
+      - "8083:8083"
+    environment:
+      DB_HOST: mysql
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      CATALOGO_URL: http://catalogo-productos:8082
+    depends_on:
+      mysql:
+        condition: service_healthy
+      catalogo-productos:
+        condition: service_started
+
+  gateway:
+    build: ./gateway
+    container_name: powernut-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      AUTH_URL: http://usuarios-auth:8081
+      CATALOGO_URL: http://catalogo-productos:8082
+      PEDIDOS_URL: http://pedidos:8083
+    depends_on:
+      - usuarios-auth
+      - catalogo-productos
+      - pedidos
+
+volumes:
+  mysql_data:

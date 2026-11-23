@@ -20,14 +20,14 @@ public class DataInitializer {
                                 "Crema de Maní Natural — 500 g",
                                 6990,
                                 "Crema de maní",
-                                "https://via.placeholder.com/400x400?text=PowerNut+500g",
+                                "https://mejorconsalud.as.com/wp-content/uploads/2020/09/frasco-mantequilla-cacahuete.jpg",
                                 50
                         ),
                         new Producto(
                                 "Crema de Maní Natural — 1 kg",
                                 11990,
                                 "Crema de maní",
-                                "https://via.placeholder.com/400x400?text=PowerNut+1kg",
+                                "https://mejorconsalud.as.com/wp-content/uploads/2020/09/frasco-mantequilla-cacahuete.jpg",
                                 50
                         )
                 ));

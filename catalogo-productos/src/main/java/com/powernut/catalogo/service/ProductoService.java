@@ -35,7 +35,7 @@ public class ProductoService {
                 req.nombre().trim(),
                 req.precio(),
                 req.categoria().trim(),
-                req.img().trim(),
+                limpiarImg(req.img()),
                 req.stock()
         );
         return repository.save(producto);
@@ -46,13 +46,17 @@ public class ProductoService {
         existente.setNombre(req.nombre().trim());
         existente.setPrecio(req.precio());
         existente.setCategoria(req.categoria().trim());
-        existente.setImg(req.img().trim());
+        existente.setImg(limpiarImg(req.img()));
         existente.setStock(req.stock());
         return repository.save(existente);
     }
 
+    private String limpiarImg(String img) {
+        return img == null ? "" : img.trim();
+    }
+    
     public void eliminar(Long id) {
-        Producto existente = obtenerPorId(id);
-        repository.delete(existente);
+    Producto existente = obtenerPorId(id);
+    repository.delete(existente);
     }
 }

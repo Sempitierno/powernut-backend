@@ -1,0 +1,168 @@
+{
+  "info": {
+    "name": "PowerNut - Catálogo de Productos",
+    "description": "Colección de pruebas del microservicio catalogo-productos (Integrante 2). Incluye CRUD completo, filtro por categoría y pruebas de error 400 y 403.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8082"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Listar todos los productos (Público)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/products",
+          "host": ["{{baseUrl}}"],
+          "path": ["products"]
+        }
+      }
+    },
+    {
+      "name": "2. Obtener producto por ID (Público)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/products/1",
+          "host": ["{{baseUrl}}"],
+          "path": ["products", "1"]
+        }
+      }
+    },
+    {
+      "name": "3. Listar por categoría (Público)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/products/category/Crema de maní",
+          "host": ["{{baseUrl}}"],
+          "path": ["products", "category", "Crema de maní"]
+        }
+      }
+    },
+    {
+      "name": "4. Crear producto (ADMIN - 201 Created)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-User-Rol",
+            "value": "ADMIN"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Crema de Maní Crunchy — 500 g\",\n  \"precio\": 7490,\n  \"categoria\": \"Crema de maní\",\n  \"img\": \"https://via.placeholder.com/400x400?text=PowerNut+Crunchy\",\n  \"stock\": 30\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/products",
+          "host": ["{{baseUrl}}"],
+          "path": ["products"]
+        }
+      }
+    },
+    {
+      "name": "5. Crear producto sin rol ADMIN (403 Forbidden)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-User-Rol",
+            "value": "CLIENTE"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Producto no autorizado\",\n  \"precio\": 5000,\n  \"categoria\": \"Snacks\",\n  \"img\": \"https://via.placeholder.com/400x400\",\n  \"stock\": 10\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/products",
+          "host": ["{{baseUrl}}"],
+          "path": ["products"]
+        }
+      }
+    },
+    {
+      "name": "6. Crear producto con datos inválidos (400 Bad Request)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-User-Rol",
+            "value": "ADMIN"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"\",\n  \"precio\": -500,\n  \"categoria\": \"\",\n  \"img\": \"no-es-una-url\",\n  \"stock\": -1\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/products",
+          "host": ["{{baseUrl}}"],
+          "path": ["products"]
+        }
+      }
+    },
+    {
+      "name": "7. Actualizar producto por ID (ADMIN - 200 OK)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-User-Rol",
+            "value": "ADMIN"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Crema de Maní Crunchy — 500 g (Editado)\",\n  \"precio\": 7990,\n  \"categoria\": \"Crema de maní\",\n  \"img\": \"https://via.placeholder.com/400x400?text=PowerNut+Crunchy\",\n  \"stock\": 25\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/products/3",
+          "host": ["{{baseUrl}}"],
+          "path": ["products", "3"]
+        }
+      }
+    },
+    {
+      "name": "8. Eliminar producto por ID (ADMIN - 204 No Content)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "X-User-Rol",
+            "value": "ADMIN"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/products/3",
+          "host": ["{{baseUrl}}"],
+          "path": ["products", "3"]
+        }
+      }
+    }
+  ]
+}

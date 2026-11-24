@@ -4,6 +4,7 @@ import cl.powernut.dto.LoginRequest;
 import cl.powernut.dto.LoginResponse;
 import cl.powernut.dto.RegistroRequest;
 import cl.powernut.exception.CredencialesInvalidasException;
+import cl.powernut.model.RefreshToken;
 import cl.powernut.model.Rol;
 import cl.powernut.model.Usuario;
 import cl.powernut.repository.UsuarioRepository;
@@ -20,11 +21,13 @@ public class UsuarioService {
     private final UsuarioRepository repo;
     private final PasswordEncoder encoder;
     private final JwtService jwt;
+    private final RefreshTokenService refresh;
 
-    public UsuarioService(UsuarioRepository repo, PasswordEncoder encoder, JwtService jwt) {
+    public UsuarioService(UsuarioRepository repo, PasswordEncoder encoder, JwtService jwt, RefreshTokenService refresh) {
         this.repo = repo;
         this.encoder = encoder;
         this.jwt = jwt;
+        this.refresh = refresh;
     }
 
     public Usuario registrar(RegistroRequest req) {
@@ -46,14 +49,31 @@ public class UsuarioService {
         return !repo.existsByCorreo(correo.trim().toLowerCase());
     }
 
-    public LoginResponse login(LoginRequest req){
-        Usuario u = repo.findByCorreo(req.correo().trim().toLowerCase())
-                .orElseThrow(CredencialesInvalidasException::new);
-        if (!encoder.matches(req.password(), u.getPassword())){
-            throw new CredencialesInvalidasException();
-        }
-        return new LoginResponse(jwt.generarToken(u), u.getNombre(), u.getCorreo(), u.getRol().name());
+    public LoginResponse login(LoginRequest req) {
+    Usuario u = repo.findByCorreo(req.correo().trim().toLowerCase())
+            .orElseThrow(CredencialesInvalidasException::new);
+    if (!encoder.matches(req.password(), u.getPassword())) {
+        throw new CredencialesInvalidasException();
     }
+    return respuestaConTokens(u);
+}
+
+public LoginResponse renovar(String refreshToken) {
+    RefreshToken rt = refresh.validar(refreshToken);
+    refresh.revocar(rt);                 // rotación: el viejo ya no sirve
+    return respuestaConTokens(rt.getUsuario());
+}
+
+public void logout(String refreshToken) {
+    refresh.revocar(refresh.validar(refreshToken));
+}
+
+private LoginResponse respuestaConTokens(Usuario u) {
+    return new LoginResponse(
+            jwt.generarToken(u),
+            refresh.crear(u).getToken(),
+            u.getNombre(), u.getCorreo(), u.getRol().name());
+}
 
     public Usuario buscarPorCorreo(String correo){
         return repo.findByCorreo(correo)

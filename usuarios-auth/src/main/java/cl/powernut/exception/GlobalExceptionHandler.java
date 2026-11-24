@@ -27,4 +27,9 @@ public class GlobalExceptionHandler {
     ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error",
     ex.getMessage()));
     }
+
+    @ExceptionHandler(TokenInvalidoException.class)
+    public ResponseEntity<Map<String, String>> tokenInvalido(TokenInvalidoException ex) {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", ex.getMessage()));
+}
 }

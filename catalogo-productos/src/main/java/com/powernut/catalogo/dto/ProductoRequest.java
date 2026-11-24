@@ -17,7 +17,7 @@ public record ProductoRequest(
         @NotBlank(message = "La categoría es obligatoria")
         String categoria,
 
-        @Pattern(regexp = "^https?://.+", message = "La URL de imagen debe comenzar con http:// o https://")
+        @Pattern(regexp = "^$|^https?://.+", message = "La URL de imagen debe comenzar con http:// o https://")
         String img,
 
         @NotNull(message = "El stock es obligatorio")

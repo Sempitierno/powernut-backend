@@ -30,6 +30,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      SPRING_PROFILES_ACTIVE: prod
     depends_on:
       mysql:
         condition: service_healthy
